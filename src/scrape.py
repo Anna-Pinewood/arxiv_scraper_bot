@@ -44,7 +44,7 @@ def scrape_arxiv(date_from: str,
         filter_regex, regex=True)]
     logger.info("Articles left after abstract filering: %s", len(filtered_df))
 
-    filtered_df = filtered_df.sort_values(by='created', ascending=True)
+    filtered_df = filtered_df.sort_values(by='created', ascending=False)
     filtered_df.sort_values(by='created', ascending=False)
     filtered_df['created'] = filtered_df['created'].dt.strftime('%Y-%m-%d')
     filtered_df = filtered_df.reset_index(drop=True)
