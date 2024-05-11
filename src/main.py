@@ -42,6 +42,10 @@ async def scrape(update: Update, context: CallbackContext):
                                filters=filters_for_arxiv_lib,
                                filter_regex=regex_keywords,
                                )
+    if len(df_articles) == 0:
+        message = "No articles for this query. Perhaps try broaden search dates?"
+        await update.message.reply_text(message, parse_mode="HTML")
+
     filtered_articles = df_articles[:num_articles]
 
     message = ""
