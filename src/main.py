@@ -29,7 +29,7 @@ data = {
 df_articles = pd.DataFrame(data)
 
 
-def scrape(update: Update, context: CallbackContext):
+async def scrape(update: Update, context: CallbackContext):
     """E.g.
     /scrape llm,transformers 10 11.05 12.05
     """
@@ -52,20 +52,19 @@ def scrape(update: Update, context: CallbackContext):
     print(f"date_from={start_date}, date_until={end_date}, filters={filters}")
     df_articles = scrape_arxiv(date_from=start_date,
                                date_until=end_date,
-                               filters=filters
+                               filters=filters,
                                )
     filtered_articles = df_articles[:num_articles]
 
     message = ""
-    for i, row in enumerate(filtered_articles.iterrows(), start=1):
-        print(row)
+    for i, row in filtered_articles.iterrows():
         article_id, title, abstract, created, url = row['id'], row[
             'title'], row['abstract'], row['created'], row['url']
         first_sentence = abstract.split(".")[0] + "."
         last_sentence = abstract.split(".")[-1].strip()
-        message += f"{i}. {title}\nPublication date: {created}\nLink: {url}\nID: `{article_id}`\nAbstract: {first_sentence} ... {last_sentence}\n\n"
+        message += f"{i+1}. {title}\nPublication date: {created}\nLink: {url}\nID: `{article_id}`\nAbstract: {first_sentence} ... {last_sentence}\n\n"
 
-    update.message.reply_text(message)
+    await update.message.reply_text(message)
 
 
 def get_abstract(update: Update, context: CallbackContext):
@@ -96,7 +95,7 @@ if __name__ == '__main__':
     path_to_config = Path(__file__).parent.parent / 'config.yaml'
     with open(path_to_config, 'r') as file:
         config = yaml.safe_load(file)
-        
+
     TELEGRAM_TOKEN = config['tg_token']
 
     main()
