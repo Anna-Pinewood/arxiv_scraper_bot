@@ -6,7 +6,7 @@ from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandle
 from telegram import Update, Message, Bot
 import logging
 
-from scrape import scrape_arxiv
+from scrape import scrape_abstract, scrape_arxiv
 
 
 logging.basicConfig(
@@ -61,7 +61,7 @@ async def scrape(update: Update, context: CallbackContext):
     message = ""
     for i, row in filtered_articles.iterrows():
         article_id, title, abstract, created, url = row['id'], row[
-            'title'], row['abstract'], row['created'], row['url']
+            'title'].capitalize(), row['abstract'], row['created'], row['url']
         first_sentence = (abstract.split(".")[0] + ".").capitalize()
         last_sentence = (abstract.split(".")[-1].strip()).capitalize()
         if last_sentence == '':
@@ -74,17 +74,17 @@ async def scrape(update: Update, context: CallbackContext):
             message = ""
 
 
-def get_abstract(update: Update, context: CallbackContext):
+async def get_abstract(update: Update, context: CallbackContext):
     article_id = context.args[0]
 
-    # Find the article by ID
-    article = df_articles[df_articles['id'] == article_id]
-    if not article.empty:
-        title, abstract, url = article[['title', 'abstract', 'url']].iloc[0]
-        update.message.reply_text(
-            f"{title}\nLink: {url}\n\nFull abstract:\n{abstract}")
-    else:
-        update.message.reply_text("Article not found.")
+    article_info = scrape_abstract(article_id)
+    if article_info == 1:
+        await update.message.reply_text("Article not found.")
+
+    title, abstract, published, url = article_info['title'], article_info[
+        'abstract'], article_info['published'], article_info['url']
+    await update.message.reply_text(
+        f"<b>{title}</b>\nLink: {url}\nDate: <u>{published}</u>\nFull abstract:\n<blockquote>{abstract}</blockquote>", parse_mode="HTML")
 
 
 help_message = """
