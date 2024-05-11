@@ -14,26 +14,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-# Replace this with actual data or a function to fetch data from your DataFrame
-# For demonstration purposes, I'll simulate a DataFrame
-data = {
-    'id': ['2205.00001', '2205.00002'],
-    'title': ['A Comprehensive Overview of Large Language Models', 'Transformers in AI Applications'],
-    'abstract': [
-        'Large Language Models (LLMs) have recently demonstrated remarkable capabilities... This review article is intended to not only provide a systematic survey but also a quick comprehensive reference for the researchers.',
-        'Transformers have revolutionized various AI tasks by effectively processing sequential data... Our work presents an extensive analysis of transformers and their impact on the field.'
-    ],
-    'created': ['11.05.2022', '10.05.2022'],
-    'url': ['http://arxiv.org/abs/2205.00001', 'http://arxiv.org/abs/2205.00002']
-}
-df_articles = pd.DataFrame(data)
-
-
 async def scrape(update: Update, context: CallbackContext):
     """E.g.
     /scrape llm|transformers&robots 10 11.05 12.05
     """
-
+    if len(context.args) < 4:
+        msg = "Your command missing some args. Use /help for instructions."
+        await update.message.reply_text(msg)
     regex_keywords = context.args[0]
     search_keywords = context.args[0].replace('&', '|').split('|')
 
@@ -46,11 +33,10 @@ async def scrape(update: Update, context: CallbackContext):
 
     filters_for_arxiv_lib = {
         'abstract': search_keywords,
-        'categories': ['cs.cl', 'cs.ai', 'cs.ro', 'cs.cv', 'cs.gt', 'cs.ne', 'cs.hc', 'cs.cy', 'cs.lg', 'cs.ir', 'cs.se', 'cs.ma']
+        # 'categories': ['cs.cl', 'cs.ai', 'cs.ro', 'cs.cv', 'cs.gt', 'cs.ne', 'cs.hc', 'cs.cy', 'cs.lg', 'cs.ir', 'cs.se', 'cs.ma']
         # 'categories': ['cs.cl']
     }
-    print(
-        f"date_from={start_date}, date_until={end_date}, filters={filters_for_arxiv_lib}")
+
     df_articles = scrape_arxiv(date_from=start_date,
                                date_until=end_date,
                                filters=filters_for_arxiv_lib,
@@ -75,6 +61,9 @@ async def scrape(update: Update, context: CallbackContext):
 
 
 async def get_abstract(update: Update, context: CallbackContext):
+    if len(context.args) < 1:
+        msg = "Your command missing article_id. Use /help for instructions."
+        await update.message.reply_text(msg)
     article_id = context.args[0]
 
     article_info = scrape_abstract(article_id)
@@ -87,20 +76,36 @@ async def get_abstract(update: Update, context: CallbackContext):
         f"<b>{title}</b>\nLink: {url}\nDate: <u>{published}</u>\nFull abstract:\n<blockquote>{abstract}</blockquote>", parse_mode="HTML")
 
 
-help_message = """
-command options:
-`/scrape llm|transformers&robots 10 08.05 12.05`
+help_message = f"""
+Hello, this is <b>Arxiv Scraper Bot</b>! Get latest articles on interested topics right here!
+====Command examples====:
+<code>/scrape</code>
+<code>/scrape llm|transformers&robots 10 08.05 12.05</code>
+<code>/scrape dwh 10 08.05 12.05</code>
+<code>/scrape llm|llms 10 {(pd.Timestamp.today() - pd.Timedelta(days=3)).date().strftime("%d.%m")} {pd.Timestamp.today().date().strftime("%d.%m")}</code> \
+    – <b>scrape latest articles for 3 days</b>
+That means
+/scrape llm|transformers&robots n_articles=10, publish date is between 08.05 to 12.05 of current year.
+This command will get you last 10 articles, abctract of which containt either llm substring or both transformers and robots. Search is case insensitive.
+Mind that space won't work <code>/scrape "large language models|cats" 10 08.05 12.05</code> - this won' work.
+Note that search is in predefiened category - computer science.
+<b>Scraping can take a while, e.g., scraping for last 3 days will take approximarely <u>30 seconds</u></b>.
+
+<code>/get_abstract</code>
+<code>/get_abstract 2405.05955</code>
+This command will get ypu abstract of the article with arxiv id passed. You can copy arxiv id from /scrape command output.
 """
 
 
 async def help(update: Update, context: CallbackContext) -> None:
-    await update.message.reply_text('Привет! Я бот с кнопками реакции.')
+    await update.message.reply_text(help_message,  parse_mode="HTML")
 
 
 def main() -> None:
     application = Application.builder().token(TELEGRAM_TOKEN).build()
 
     application.add_handler(CommandHandler("help", help))
+    application.add_handler(CommandHandler("start", help))
     application.add_handler(CommandHandler("get_abstract", get_abstract))
     application.add_handler(CommandHandler("scrape", scrape))
 

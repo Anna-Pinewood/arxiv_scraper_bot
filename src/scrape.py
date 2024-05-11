@@ -19,8 +19,8 @@ def scrape_arxiv(date_from: str,
     scraper = ax.Scraper(category='cs',
                          date_from=date_from,
                          date_until=date_until,
-                         t=10,
-                         filters=filters)
+                         t=10)
+    #  filters=filters)
     output = scraper.scrape()
     logger.info("Scraped %s articles", len(output))
 
@@ -35,9 +35,10 @@ def scrape_arxiv(date_from: str,
                      & (df.created > date_from)]
     logger.info("Articles left after date filering: %s", len(filtered_df))
 
-    filtered_df = filtered_df[filtered_df['categories'].apply(
-        lambda x:  len(set(x.split()) & set(filters['categories'])) > 0)]
-    logger.info("Articles left after cat filering: %s", len(filtered_df))
+    if 'categories' in filters:
+        filtered_df = filtered_df[filtered_df['categories'].apply(
+            lambda x:  len(set(x.split()) & set(filters['categories'])) > 0)]
+        logger.info("Articles left after cat filering: %s", len(filtered_df))
 
     filtered_df = filtered_df[filtered_df['abstract'].str.contains(
         filter_regex, regex=True)]
