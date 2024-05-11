@@ -6,7 +6,8 @@ logger = logging.getLogger(__name__)
 
 def scrape_arxiv(date_from: str,
                  date_until: str | None = None,
-                 filters: dict[str, list[str]] | None = None
+                 filters: dict[str, list[str]] | None = None,
+                 filter_regex: str | None = None
                  ) -> pd.DataFrame:
     if date_until is None:
         date_until = str(pd.Timestamp.today().date())
@@ -33,11 +34,7 @@ def scrape_arxiv(date_from: str,
         lambda x:  len(set(x.split()) & set(filters['categories'])) > 0)]
     logger.info("Articles left after cat filering: %s", len(filtered_df))
 
-    print(filtered_df.columns)
-    filtered_df = filtered_df[filtered_df['abstract'].apply(
-        lambda abstract:  len(set(abstract.split()) & set(filters['abstract'])) > 0)]
-
-    # filtered_df = filtered_df.abstract.str.contains(pattern, regex=True)
+    filtered_df = filtered_df[filtered_df['abstract'].str.contains(filter_regex, regex=True)]
     logger.info("Articles left after abstract filering: %s", len(filtered_df))
 
     filtered_df = filtered_df.sort_values(by='created', ascending=True)
