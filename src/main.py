@@ -55,7 +55,7 @@ async def scrape(update: Update, context: CallbackContext):
         first_sentence = (abstract.split(".")[0] + ".").capitalize()
         last_sentence = (abstract.split(".")[-1].strip()).capitalize()
         if last_sentence == '':
-            last_sentence = abstract.split(".")[-2].strip()
+            last_sentence = abstract.split(".")[-2].strip().capitalize()
 
         message += f"{i+1}. <b>{title}</b>\nPublication date: <u>{created}</u>\nLink: {url}\nID: <code>{article_id}</code>\nAbstract:\n<blockquote>{first_sentence} ... {last_sentence}</blockquote>\n\n"
 
