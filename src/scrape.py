@@ -40,9 +40,10 @@ def scrape_arxiv(date_from: str,
             lambda x:  len(set(x.split()) & set(filters['categories'])) > 0)]
         logger.info("Articles left after cat filering: %s", len(filtered_df))
 
-    filtered_df = filtered_df[filtered_df['abstract'].str.contains(
-        filter_regex, regex=True)]
-    logger.info("Articles left after abstract filering: %s", len(filtered_df))
+    filtered_df = filtered_df[(filtered_df['abstract'].str.contains(filter_regex, regex=True)) | (filtered_df['title'].str.contains(
+        filter_regex, regex=True))]
+    logger.info(
+        "Articles left after abstract and title filering: %s", len(filtered_df))
 
     filtered_df = filtered_df.sort_values(by='created', ascending=False)
     filtered_df.sort_values(by='created', ascending=False)

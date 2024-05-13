@@ -16,17 +16,19 @@ logger = logging.getLogger(__name__)
 
 async def scrape(update: Update, context: CallbackContext):
     """E.g.
-    /scrape llm|transformers&robots 10 11.05 12.05
+    /scrape llm|transformers|large_language_models 10 11.05 12.05
     """
     if len(context.args) < 4:
         msg = "Your command missing some args. Use /help for instructions."
         await update.message.reply_text(msg)
-    regex_keywords = context.args[0]
+    regex_keywords = context.args[0].replace("_", " ")
     search_keywords = context.args[0].replace('&', '|').split('|')
 
     num_articles, start_date, end_date = int(
         context.args[1]), context.args[2], context.args[3]
-    transform_date = lambda x: f"{datetime.date.today().year}-{int(x.split('.')[1]):02}-{int(x.split('.')[0]):02}"
+
+    def transform_date(
+        x): return f"{datetime.date.today().year}-{int(x.split('.')[1]):02}-{int(x.split('.')[0]):02}"
     start_date = transform_date(start_date)
     end_date = transform_date(end_date)
 
@@ -81,6 +83,7 @@ async def get_abstract(update: Update, context: CallbackContext):
 
 help_message = f"""
 Hello, this is <b>Arxiv Scraper Bot</b>! Get latest articles on interested topics right here!
+
 ====Command examples====:
 <code>/scrape</code>
 <code>/scrape llm|transformers&robots 10 08.05 12.05</code>
@@ -88,9 +91,12 @@ Hello, this is <b>Arxiv Scraper Bot</b>! Get latest articles on interested topic
 <code>/scrape llm|llms 10 {(pd.Timestamp.today() - pd.Timedelta(days=3)).date().strftime("%d.%m")} {pd.Timestamp.today().date().strftime("%d.%m")}</code> \
     – <b>scrape latest articles for 3 days</b>
 That means
-/scrape llm|transformers&robots n_articles=10, publish date is between 08.05 to 12.05 of current year.
+/scrape llm|transformers&robots <code>n_articles=10</code>, publish date is between 08.05 to 12.05 of current year.
 This command will get you last 10 articles, abctract of which containt either llm substring or both transformers and robots. Search is case insensitive.
-Mind that space won't work <code>/scrape "large language models|cats" 10 08.05 12.05</code> - this won' work.
+
+Mind that if you want to use spaces, use <code>_</code>. Simple space won't work <code>/scrape "large language models|cats" 10 08.05 12.05</code> - this won' work.\
+ But <code>/scrape "large_language_models|cats" 10 08.05 12.05</code> will work.
+ 
 Note that search is in predefiened category - computer science.
 <b>Scraping can take a while, e.g., scraping for last 3 days will take approximarely <u>30 seconds</u></b>.
 
