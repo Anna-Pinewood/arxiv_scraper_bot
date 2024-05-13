@@ -91,7 +91,7 @@ Hello, this is <b>Arxiv Scraper Bot</b>! Get latest articles on interested topic
 <code>/scrape</code>
 <code>/scrape llm|transformers&robots 10 08.05 12.05</code>
 <code>/scrape dwh 10 08.05 12.05</code>
-<code>/scrape arge_language_models|llms|llm 10 {(pd.Timestamp.today() - pd.Timedelta(days=3)).date().strftime("%d.%m")} {pd.Timestamp.today().date().strftime("%d.%m")}</code> \
+<code>/scrape large_language_models|llms|llm 10 {(pd.Timestamp.today() - pd.Timedelta(days=3)).date().strftime("%d.%m")} {pd.Timestamp.today().date().strftime("%d.%m")}</code> \
     – <b>scrape latest articles for 3 days</b>
 That means
 /scrape llm|transformers&robots <code>n_articles=10</code>, publish date is between 08.05 to 12.05 of current year.
@@ -105,7 +105,7 @@ Note that search is in predefiened category - computer science.
 
 <code>/get_abstract</code>
 <code>/get_abstract 2405.05955</code>
-This command will get ypu abstract of the article with arxiv id passed. You can copy arxiv id from /scrape command output.
+This command will get you abstract of the article with arxiv id passed. You can copy arxiv id from /scrape command output.
 """
 
 
