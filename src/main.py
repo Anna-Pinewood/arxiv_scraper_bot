@@ -26,8 +26,7 @@ async def scrape(update: Update, context: CallbackContext):
 
     num_articles, start_date, end_date = int(
         context.args[1]), context.args[2], context.args[3]
-    def transform_date(
-        x): return f"{datetime.date.today().year}-{int(x.split('.')[1]):02}-{int(x.split('.')[0]):02}"
+    transform_date = lambda x: f"{datetime.date.today().year}-{int(x.split('.')[1]):02}-{int(x.split('.')[0]):02}"
     start_date = transform_date(start_date)
     end_date = transform_date(end_date)
 

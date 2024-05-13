@@ -31,8 +31,8 @@ def scrape_arxiv(date_from: str,
     # filtered_df['updated'] = pd.to_datetime(filtered_df['updated'])
     df['created'] = pd.to_datetime(df['created'])
     # filtered_df = filtered_df[ (filtered_df.updated < date_to) & (filtered_df.updated > date_from) | (filtered_df.created < date_to) & (filtered_df.created > date_from)]
-    filtered_df = df[(df.created < date_until)
-                     & (df.created > date_from)]
+    filtered_df = df[(df.created <= date_until)
+                     & (df.created >= date_from)]
     logger.info("Articles left after date filering: %s", len(filtered_df))
 
     if 'categories' in filters:
