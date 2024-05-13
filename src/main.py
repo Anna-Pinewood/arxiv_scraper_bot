@@ -32,6 +32,9 @@ async def scrape(update: Update, context: CallbackContext):
     start_date = transform_date(start_date)
     end_date = transform_date(end_date)
 
+    logger.info("Date from: %s\nDate to:%s\nstring_regex: `%s`",
+                start_date, end_date, regex_keywords)
+
     filters_for_arxiv_lib = {
         'abstract': search_keywords,
         # 'categories': ['cs.cl', 'cs.ai', 'cs.ro', 'cs.cv', 'cs.gt', 'cs.ne', 'cs.hc', 'cs.cy', 'cs.lg', 'cs.ir', 'cs.se', 'cs.ma']
@@ -88,7 +91,7 @@ Hello, this is <b>Arxiv Scraper Bot</b>! Get latest articles on interested topic
 <code>/scrape</code>
 <code>/scrape llm|transformers&robots 10 08.05 12.05</code>
 <code>/scrape dwh 10 08.05 12.05</code>
-<code>/scrape llm|llms 10 {(pd.Timestamp.today() - pd.Timedelta(days=3)).date().strftime("%d.%m")} {pd.Timestamp.today().date().strftime("%d.%m")}</code> \
+<code>/scrape arge_language_models|llms|llm 10 {(pd.Timestamp.today() - pd.Timedelta(days=3)).date().strftime("%d.%m")} {pd.Timestamp.today().date().strftime("%d.%m")}</code> \
     – <b>scrape latest articles for 3 days</b>
 That means
 /scrape llm|transformers&robots <code>n_articles=10</code>, publish date is between 08.05 to 12.05 of current year.
